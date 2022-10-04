@@ -1,12 +1,31 @@
 #include <iostream>
 #include "Shader.h"
 
+std::string ReadFile(const char* path) {
+	std::string code;
+	std::fstream fileStream(path, std::ios::in);
+
+	if (!fileStream.is_open()) {
+		std::cout << "File not found!" << std::endl;
+	}
+
+	std::string line;
+	while (!fileStream.eof()) {
+		std::getline(fileStream, line);
+		code.append(line + "\n");
+	}
+
+	fileStream.close();
+	return code;
+}
+
 Shader::Shader() {
-	return;
+	shaderId = uniformModel = uniformProjection = 0;
 }
 
 Shader::~Shader() {
-	return;
+	if (shaderId != 0)
+		glDeleteProgram(shaderId);
 }
 
 void Shader::CreateFromString(const char* vertexCode, const char* fragmentCode) {
@@ -14,9 +33,9 @@ void Shader::CreateFromString(const char* vertexCode, const char* fragmentCode) 
 }
 
 void Shader::CreateFromFile(const char* vertexCodePath, const char* fragmentCodePath) {
-	//const char* vertexCode;
-	//const char* fragmentCode;
-	//Compile(vertexCode, fragmentCode);
+	std::string vertexCode = ReadFile(vertexCodePath);
+	std::string fragmentCode = ReadFile(fragmentCodePath);
+	Compile(vertexCode.c_str(), fragmentCode.c_str());
 }
 
 void Shader::Compile(const char* vertexCode, const char* fragmentCode) {
